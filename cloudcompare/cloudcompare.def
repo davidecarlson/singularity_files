@@ -1,0 +1,25 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%environment
+
+%post
+	export TZ=UTC
+    	export DEBIAN_FRONTEND=noninteractive
+	apt-get update && apt install -y \
+	 build-essential \
+	 git-all \
+	cmake \
+	libqt5svg5-dev \
+	libqt5opengl5-dev \
+	qttools5-dev \
+	qttools5-dev-tools \
+	libqt5websockets5-dev
+	
+	cd ${HOME}
+	git clone --recursive https://github.com/cloudcompare/CloudCompare.git
+	
+	cd CloudCompare && mkdir build && cd build
+	cmake ..
+	make -j 12
+	make install
