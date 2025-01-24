@@ -1,0 +1,52 @@
+Bootstrap: docker
+From: rockylinux:8
+
+%environment
+
+%post
+	
+	export TZ=UTC
+	export LC_ALL=C
+	export LANG=C
+	
+	echo "==> Updating base system..."
+	dnf -y update
+	
+	echo "==> Installing EPEL (if you want extra packages from EPEL)..."
+    	dnf -y install epel-release
+	
+	 echo "==> Installing basic development tools..."
+   	 dnf -y groupinstall "Development Tools"
+
+	echo "==> Installing additional common dev tools..."
+    	dnf -y install \
+	dnf-plugins-core \
+        cmake \
+        wget
+
+	dnf -y install \
+    	mesa-libGL \
+    	mesa-libEGL \
+    	mesa-dri-drivers \
+    	libglvnd-glx
+
+	dnf --enablerepo=devel -y install qt5-qtbase-devel qt5-qtsvg-devel qt5-qttools-devel \
+               qt5-qtdeclarative-devel qt5-qtxmlpatterns-devel \
+               qt5-qtwebsockets-devel qt5-qtx11extras-devel qt5-qtbase-static
+	
+	echo "==> Cleaning up..."
+    	dnf clean all
+	
+	export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"	
+
+	cd ${HOME}
+	which make	
+	g++ --version
+
+	cd ${HOME}
+	git clone --recursive https://github.com/cloudcompare/CloudCompare.git
+	
+	cd CloudCompare && mkdir build && cd build
+	cmake ..
+	make -j 12
+	make install
